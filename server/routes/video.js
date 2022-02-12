@@ -50,6 +50,21 @@ router.post('/uploadfiles',(req,res)=>{
     })
 })
 
+router.post('/uploadVideo',(req,res)=>{
+
+    // 비디오 정보들을 저장한다.
+    
+    // client (variable) -> req.body에 담김
+    const video = new Video(req.body) 
+
+    //save : mongo db method
+    video.save((err,doc)=>{
+        if(err) return res.json({success:false,err})
+        res.status(200).json({success:true}) 
+    })
+    
+})
+
 router.post('/thumbnail',(req,res)=>{
 
     // 썸네일 생성 하고 비디오 러닝타입도 가져오기
