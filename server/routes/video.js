@@ -57,6 +57,7 @@ router.post('/thumbnail',(req,res)=>{
     let filePath = ""
     let fileDuration = ""
 
+    // ffmpeg 시스템 환경변수를 못가져오는 오류때문에 아래 코드 추가
     ffmpeg.setFfmpegPath('C:\\Program Files\\ffmpeg\\bin\\ffmpeg.exe')
 
     //비디오 정보 가져오기
