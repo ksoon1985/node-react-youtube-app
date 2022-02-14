@@ -65,6 +65,20 @@ router.post('/uploadVideo',(req,res)=>{
     
 })
 
+router.get('/getVideos', (req,res)=>{
+
+    // 비디오를 db 에서 가져와서 클라이언트에 보낸다.
+
+    // mongo db에서 모든 비디오를 가져옴
+    Video.find()
+    .populate('writer') // populate를 해줘야 user모델의 모든 컬럼들을 가져올 수 있음(안해주면 id만 가져옴)
+    .exec((err,videos)=>{
+        if(err) return res.status(400).send(err);
+        res.status(200).json({success:true,videos})
+    })
+    
+})
+
 router.post('/thumbnail',(req,res)=>{
 
     // 썸네일 생성 하고 비디오 러닝타입도 가져오기
