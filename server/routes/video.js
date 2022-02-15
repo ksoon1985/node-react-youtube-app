@@ -6,6 +6,7 @@ const { auth } = require("../middleware/auth");
 
 const multer = require('multer');
 var ffmpeg = require('fluent-ffmpeg');
+const { Subscriber } = require('../models/Subscriber');
 
 // STORAGE MULTER CONFIG
 let storage = multer.diskStorage({
@@ -65,6 +66,7 @@ router.post('/uploadVideo',(req,res)=>{
     
 })
 
+// 비디오들 가져오기 
 router.get('/getVideos', (req,res)=>{
 
     // 비디오를 db 에서 가져와서 클라이언트에 보낸다.
@@ -79,6 +81,7 @@ router.get('/getVideos', (req,res)=>{
     
 })
 
+// 비디오 상세 페이지
 router.post('/getVideoDetail',(req,res)=>{
 
     Video.findOne({"_id":req.body.videoId})
@@ -89,6 +92,7 @@ router.post('/getVideoDetail',(req,res)=>{
     })
 })
 
+// 썸네일 생성 
 router.post('/thumbnail',(req,res)=>{
 
     // 썸네일 생성 하고 비디오 러닝타입도 가져오기
@@ -129,6 +133,32 @@ router.post('/thumbnail',(req,res)=>{
         size:'320x240',
         // '%b' : input basename (filename w/o extension)
         filename : 'thumbnail-%b.png'
+    })
+})
+
+// 구독한 비디오들 가져오기
+router.post('/getSubscriptionVideos',(req,res)=>{
+
+    // 자신의 id를 가지고 구독하는 사람들을 찾는다. 
+    Subscriber.find({ userFrom : req.body.userFrom })
+    .exec((err,subscriberInfo)=>{
+        if(err) return res.status(400).send(err);
+
+        // 내가 구독한 유투버들 
+        let subscribedUser = [];
+
+        subscriberInfo.map((subscriber,i)=>{
+            subscribedUser.push(subscriber.userTo);
+        })
+
+        // 찾은 사람들의 비디오를 가지고 온다.
+        Video.find({writer : { $in : subscribedUser}})
+        .populate('writer')
+        .exec((err,videos)=>{
+            if(err) return res.status(400).send(err);
+            res.status(200).json({success:true,videos})
+        })
+
     })
 })
 
